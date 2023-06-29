@@ -12,7 +12,7 @@
 #define COUNTIMER_MAX_HOURS 999
 #define COUNTIMER_MAX_MINUTES_SECONDS 59
 
-typedef void(*timer_callback)(void);
+typedef void(*timer_callback)(void*);
 
 class Countimer
 {
@@ -28,7 +28,7 @@ public:
 	};
 
 	// Set up counter time(hours, minutes, seconds), count mode and function to execute if count is completed.
-	void setCounter(uint16_t hours, uint8_t minutes, uint8_t seconds, CountType countType, timer_callback onComplete);
+	void setCounter(uint16_t hours, uint8_t minutes, uint8_t seconds, CountType countType, timer_callback onComplete, void *data = NULL);
 
 	// Set up counter time(hours, minutes, seconds) for existing timer.
 	void setCounter(uint16_t hours, uint8_t minutes, uint8_t seconds);
@@ -42,7 +42,7 @@ public:
 	// Returns timer's current seconds.
 	uint8_t getCurrentSeconds();
 
-	void setInterval(timer_callback callback, uint32_t interval);
+	void setInterval(timer_callback callback, uint32_t interval, void *data = NULL);
 
 	// Returns current timer as formatted string HH:MM:SS
 	char* getCurrentTime();
@@ -73,13 +73,13 @@ public:
 	void restart();
 
 private:
-	// Counting down timer.
+	// Counting up timer.
 	void countDown();
 	
 	void callback();
 	void complete();
 
-	// Counting up timer.
+	// Counting down timer.
 	void countUp();
 
 	uint32_t _interval = 1;
@@ -93,10 +93,14 @@ private:
 	uint32_t _countTime;
 
 	// Function to execute.
-	timer_callback _callback;
+	timer_callback _callback = NULL;
+	
+        // User data to pass to callback or onComplete:
+        void *_callbackData;
+	void *_onCompleteData;
 
 	// Function to execute when timer is complete.
-	timer_callback _onComplete;
+	timer_callback _onComplete = NULL;
 	bool _isCounterCompleted;
 	bool _isStopped;
 	char _formatted_time[10];

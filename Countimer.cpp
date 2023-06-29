@@ -16,10 +16,11 @@ Countimer::~Countimer()
 {
 }
 
-void Countimer::setCounter(uint16_t hours, uint8_t minutes, uint8_t seconds, CountType countType, timer_callback onComplete)
+void Countimer::setCounter(uint16_t hours, uint8_t minutes, uint8_t seconds, CountType countType, timer_callback onComplete, void *data)
 {
 	_onComplete = onComplete;
 	_countType = countType;
+	_onCompleteData = data;
 	setCounter(hours, minutes, seconds);
 }
 
@@ -50,10 +51,11 @@ void Countimer::setCounter(uint16_t hours, uint8_t minutes, uint8_t seconds)
 
 }
 
-void Countimer::setInterval(timer_callback callback, uint32_t interval)
+void Countimer::setInterval(timer_callback callback, uint32_t interval, void *data)
 {
 	_interval = interval;
 	_callback = callback;
+	_callbackData = data;
 }
 
 uint16_t Countimer::getCurrentHours()
@@ -149,7 +151,11 @@ void Countimer::countDown()
 	if (_currentCountTime > 0)
 	{
 		callback();
-		_currentCountTime -= _interval;
+		_currentCountTime -= millis() - _previousMillis;
+		if (_currentCountTime > _countTime) { // Detect underflow
+			stop();
+			complete();
+		}
 	}
 	else
 	{
@@ -163,7 +169,7 @@ void Countimer::countUp()
 	if (_currentCountTime < _countTime)
 	{
 		callback();
-		_currentCountTime += _interval;
+		_currentCountTime += millis() - _previousMillis;
 	}
 	else
 	{
@@ -175,11 +181,11 @@ void Countimer::countUp()
 void Countimer::callback()
 {
 	if(_callback != NULL)
-		_callback();
+		_callback(_callbackData);
 }
 
 void Countimer::complete()
 {
 	if(_onComplete != NULL)
-		_onComplete();
+		_onComplete(_onCompleteData);
 }

@@ -1,3 +1,8 @@
+# Fork Notes
+This repo differs from the original Countimer in a few important ways:
+ * Allows passing of user data to callbacks in the form of a pointer
+ * Safely handles pauses or slow execution in other parts of the code. As a side effect of this, the `setInterval` callback might not happen at exactly when it is "supposed" to.
+
 # Countimer
 
 This is simple timer and counter Arduino library.  

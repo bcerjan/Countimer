@@ -38,7 +38,7 @@ void Countimer::setCounter(uint16_t hours, uint8_t minutes, uint8_t seconds)
 		seconds = COUNTIMER_MAX_MINUTES_SECONDS;
 	}
 
-	_currentCountTime = ((hours * 3600L) + (minutes * 60L) + seconds) * 1000L;
+	_currentCountTime = ((hours * 3600L) + (minutes * 60L) + seconds) * 1000L + millis();
 	_countTime = _currentCountTime;
 
 	if (_countType == COUNT_UP)
